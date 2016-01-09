@@ -1,4 +1,3 @@
-
 /**
  *
  * @file sound.cpp
@@ -35,7 +34,7 @@
 #include <SDL/SDL_audio.h>
 
 #ifdef USE_MODPLUG
-	#include <modplug.h>
+	#include <libmodplug/modplug.h>
 #endif
 
 
