@@ -32,9 +32,8 @@
 #include "io/gfx/video.h"
 #include "util.h"
 
-#include <string.h>
 #include <zlib.h>
-
+#include <algorithm>
 
 /**
  * Try opening a file from the available paths
@@ -73,8 +72,6 @@ File::~File () {
 	log("Closed file", filePath);
 #endif
 
-	delete[] filePath;
-
 	return;
 
 }
@@ -87,48 +84,39 @@ File::~File () {
  * @param name File name
  * @param write Whether or not the file can be written to
  */
-bool File::open (const char* path, const char* name, bool write) {
+bool File::open (std::string path, std::string name, bool write) {
 
-#if defined(UPPERCASE_FILENAMES) || defined(LOWERCASE_FILENAMES)
-	int count;
-#endif
+	// Game data stores some file names in lower case
+	// while actual files usually are in upper case on a case-sensitive filesystem
+	// so we should always try to load up-cased files first
 
-	// Create the file path for the given directory
-	filePath = createString(path, name);
+	std::string upCaseName = name;
+	std::transform(upCaseName.begin(), upCaseName.end(), upCaseName.begin(), ::toupper);
 
-#ifdef UPPERCASE_FILENAMES
-	for (count = strlen(path); filePath[count]; count++) {
-
-		if ((filePath[count] >= 97) && (filePath[count] <= 122)) filePath[count] -= 32;
-
-	}
-#endif
-
-#ifdef LOWERCASE_FILENAMES
-	for (count = strlen(path); filePath[count]; count++) {
-
-		if ((filePath[count] >= 65) && (filePath[count] <= 90)) filePath[count] += 32;
-
-	}
-#endif
+	filePath = path + upCaseName;
 
 	// Open the file from the path
-	file = fopen(filePath, write ? "wb": "rb");
+	file = fopen(filePath.c_str(), write ? "wb": "rb");
 
 	if (file) {
-
 #ifdef VERBOSE
-		log("Opened file", filePath);
+		log("Opened file", filePath.c_str());
 #endif
-
 		return true;
-
 	}
 
-	delete[] filePath;
+	// Try with 'original' case then
+	filePath = path + name;
+	file = fopen(filePath.c_str(), write ? "wb": "rb");
+
+	if (file) {
+#ifdef VERBOSE
+		log("Opened file", filePath.c_str());
+#endif
+		return true;
+	}
 
 	return false;
-
 }
 
 
@@ -232,7 +220,7 @@ unsigned short int File::loadShort (unsigned short int max) {
 
 	if (val > max) {
 
-		logError("Oversized value in file", filePath);
+		logError("Oversized value in file", filePath.c_str());
 
 		return max;
 
