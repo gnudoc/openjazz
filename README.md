@@ -16,6 +16,8 @@ With the demise of DOS-based operating systems, it has become necessary to use
 emulators to play old DOS games. Jazz Jackrabbit™ deserves more - and would
 benefit greatly from new features.
 
+[![Build Status](https://travis-ci.org/Chemrat/openjazz.svg?branch=master)](https://travis-ci.org/Chemrat/openjazz)
+
 ### Jazz Jackrabbit™
 
 is a PC platform game. Produced by Epic Games (then Epic MegaGames), it was
