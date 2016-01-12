@@ -35,6 +35,9 @@
 #include <zlib.h>
 #include <algorithm>
 
+std::list<std::string> File::dataLocations;
+std::list<std::string> File::configLocations;
+
 /**
  * Try opening a file from the available paths
  *
@@ -42,16 +45,10 @@
  * @param write Whether or not the file can be written to
  */
 File::File (const char* name, bool write) {
-
-	Path* path;
-
-	path = firstPath;
-
-	while (path) {
-
-		if (open(path->path, name, write)) return;
-		path = path->next;
-
+	for (auto &searchPath : write ? File::configLocations : File::dataLocations)
+	{
+		if (open(searchPath, name, write))
+			return;
 	}
 
 	log("Could not open file", name);
@@ -117,6 +114,16 @@ bool File::open (std::string path, std::string name, bool write) {
 	}
 
 	return false;
+}
+
+void File::addDataSearchPath(std::string path)
+{
+	dataLocations.emplace_back(path);
+}
+
+void File::addConfigPath(std::string path)
+{
+	configLocations.emplace_back(path);
 }
 
 

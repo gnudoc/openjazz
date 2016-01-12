@@ -31,6 +31,7 @@
 #include <SDL/SDL.h>
 
 #include <string>
+#include <list>
 
 // Classes
 
@@ -43,9 +44,15 @@ class File {
 
 		bool open (std::string path, std::string name, bool write);
 
+		static std::list<std::string> dataLocations;
+		static std::list<std::string> configLocations;
+
 	public:
 		File                           (const char* name, bool write);
 		~File                          ();
+
+		static void addDataSearchPath(std::string path);
+		static void addConfigPath(std::string path);
 
 		int                getSize     ();
 		void               seek        (int offset, bool reset);
@@ -80,12 +87,6 @@ class Path {
 		~Path ();
 
 };
-
-
-// Variable
-
-// Paths to files
-EXTERN Path* firstPath;
 
 #endif
 

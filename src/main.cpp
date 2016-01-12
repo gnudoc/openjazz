@@ -28,7 +28,6 @@
  *
  */
 
-
 #define EXTERN
 
 #include "game/game.h"
@@ -47,7 +46,8 @@
 #include "setup.h"
 #include "util.h"
 
-#include <string.h>
+#include <string>
+#include <set>
 
 #if defined(CAANOO) || defined(WIZ) || defined(GP2X)
 	#include "platforms/wiz.h"
@@ -88,7 +88,6 @@ Main::Main (int argc, char *argv[]) {
 
 	File* file;
 	unsigned char* pixels = NULL;
-	int count;
 	int screenW = SW;
 	int screenH = SH;
 	int scaleFactor = 1;
@@ -104,86 +103,66 @@ Main::Main (int argc, char *argv[]) {
 	// Use hard-coded paths, if available
 
 #ifdef DATAPATH
-	firstPath = new Path(NULL, createString(DATAPATH));
-#else
-	firstPath = NULL;
+	File::addSearchPath(DATAPATH);
 #endif
 
 #ifdef __SYMBIAN32__
 	#ifdef UIQ3
-	firstPath = new Path(firstPath, createString("c:\\shared\\openjazz\\"));
+	File::addSearchPath("c:\\shared\\openjazz\\");
 	#else
-	firstPath = new Path(firstPath, createString("c:\\data\\openjazz\\"));
+	File::addSearchPath("c:\\data\\openjazz\\");
 	#endif
-	firstPath = new Path(firstPath, createString(KOpenJazzPath));
+	File::addSearchPath(std::string(KOpenJazzPath));
 #endif
 
+#ifdef WIN32
+	char pathSlash = '\\';
+#else
+	char pathSlash = '/';
+#endif
 
 	// Use any provided paths, appending a directory separator as necessary
 
-	for (count = 1; count < argc; count++) {
+	std::set<std::string> options;
+	for (int index = 1; index < argc; index++) {
+		std::string argument(argv[index]);
 
-		// If it isn't an option, it should be a path
-		if (argv[count][0] != '-') {
-
-#ifdef WIN32
-			if (argv[count][strlen(argv[count]) - 1] != '\\') {
-
-				firstPath = new Path(firstPath, createString(argv[count], "\\"));
-#else
-			if (argv[count][strlen(argv[count]) - 1] != '/') {
-
-				firstPath = new Path(firstPath, createString(argv[count], "/"));
-#endif
-
+		if (argument.at(0) != '-') {
+			if (argument.back() != pathSlash) {
+				 File::addDataSearchPath(argument + pathSlash);
 			} else {
-
-				firstPath = new Path(firstPath, createString(argv[count]));
-
+				File::addDataSearchPath(argument);
 			}
-
-		}
+		} else
+			options.emplace(argument);
 
 	}
 
 
 	// Use the path of the program
+	std::string argv0(argv[0]);
+	size_t directorySeparator = 0;
 
-	count = strlen(argv[0]) - 1;
+	directorySeparator = argv0.find_last_of(pathSlash);
 
-	// Search for directory separator
-#ifdef WIN32
-	while ((argv[0][count] != '\\') && (count >= 0)) count--;
-#else
-	while ((argv[0][count] != '/') && (count >= 0)) count--;
-#endif
-
-	// If a directory was found, copy it to the path
-	if (count > 0) {
-
-		firstPath = new Path(firstPath, new char[count + 2]);
-		memcpy(firstPath->path, argv[0], count + 1);
-		firstPath->path[count + 1] = 0;
-
-	}
-
+	if (directorySeparator != argv0.npos)
+		File::addDataSearchPath(argv0.substr(0, directorySeparator + 1));
 
 	// Use the user's home directory, if available
 
 #ifdef HOMEDIR
-	#ifdef WIN32
-	firstPath = new Path(firstPath, createString(getenv("HOME"), "\\"));
-	#else
-	firstPath = new Path(firstPath, createString(getenv("HOME"), "/."));
-	#endif
+	File::addSearchPath(std::string(getenv("HOME")) + pathSlash);
 #endif
 
+#ifdef LINUX_FHS
+	File::addDataSearchPath("/usr/share/games/OpenJazz/");
+	File::addDataSearchPath(std::string(getenv("HOME")) + "/.local/share/OpenJazz/");
+	File::addConfigPath(std::string(getenv("HOME")) + "/.config/");
+#endif
 
 	// Use the current working directory
 
-	firstPath = new Path(firstPath, createString(""));
-
-
+	File::addDataSearchPath("");
 
 	// Default settings
 
@@ -205,16 +184,8 @@ Main::Main (int argc, char *argv[]) {
 	// Get command-line override
 
 #ifndef FULLSCREEN_ONLY
-	for (count = 1; count < argc; count++) {
-
-		// If there's a hyphen, it should be an option
-		if (argv[count][0] == '-') {
-
-			if (argv[count][1] == 'f') fullscreen = true;
-
-		}
-
-	}
+	if (options.find("-f") != options.end())
+		fullscreen = true;
 #endif
 
 
@@ -223,8 +194,6 @@ Main::Main (int argc, char *argv[]) {
 	canvas = NULL;
 
 	if (!video.init(screenW, screenH, fullscreen)) {
-
-		delete firstPath;
 
 		throw E_VIDEO;
 
@@ -254,8 +223,6 @@ Main::Main (int argc, char *argv[]) {
 	} catch (int e) {
 
 		closeAudio();
-
-		delete firstPath;
 
 		throw e;
 
@@ -295,8 +262,6 @@ Main::Main (int argc, char *argv[]) {
 
 		closeAudio();
 
-		delete firstPath;
-
 		throw e;
 
 	}
@@ -309,7 +274,7 @@ Main::Main (int argc, char *argv[]) {
 
 
 	// Fill trigonometric function look-up tables
-	for (count = 0; count < 1024; count++)
+	for (int count = 0; count < 1024; count++)
 		sinLut[count] = fixed(sinf(2 * PI * float(count) / 1024.0f) * 1024.0f);
 
 
@@ -317,8 +282,8 @@ Main::Main (int argc, char *argv[]) {
 	net = new Network();
 
 
-	level = NULL;
-	jj2Level = NULL;
+	level = nullptr;
+	jj2Level = nullptr;
 
 }
 
@@ -349,10 +314,6 @@ Main::~Main () {
 
 	// Save settings to config file
 	setup.save();
-
-
-	delete firstPath;
-
 }
 
 
