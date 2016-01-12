@@ -76,8 +76,18 @@ Further instructions are available at: http://www.alister.eu/jazz/oj/build.php
 - `HOMEDIR` - use the user's home directory for data files
 - `SCALE` - enable scaling of the video output (i.e. Scale2X...)
 - `FULLSCREEN_ONLY` - disable window mode, useful for console ports
+- `LINUX_FHS` - use Linux FHS paths
 
 Please see the provided Makefiles for reference.
+
+### Building using CMake
+
+There's currently work in progress support for CMake-based builds:
+
+```mkdir build
+cd build
+cmake .. && make -j4
+```
 
 ## Running
 
