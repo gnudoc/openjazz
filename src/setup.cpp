@@ -78,7 +78,7 @@ void Setup::load (int* videoW, int* videoH, bool* fullscreen, int* videoScale) {
 
 	try {
 
-		file = new File(CONFIG_FILE, false);
+		file = new File(CONFIG_FILE, false, File::Type::Config);
 
 	} catch (int e) {
 
@@ -164,7 +164,7 @@ void Setup::save () {
 	// Open config file
 	try {
 
-		file = new File(CONFIG_FILE, true);
+		file = new File(CONFIG_FILE, true, File::Type::Config);
 
 	} catch (int e) {
 

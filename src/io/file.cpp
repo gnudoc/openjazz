@@ -44,8 +44,8 @@ std::list<std::string> File::configLocations;
  * @param name File name
  * @param write Whether or not the file can be written to
  */
-File::File (const char* name, bool write) {
-	for (auto &searchPath : write ? File::configLocations : File::dataLocations)
+File::File (const char* name, bool write, Type type) {
+	for (auto &searchPath : type == Type::GameData ? File::dataLocations : File::configLocations)
 	{
 		if (open(searchPath, name, write))
 			return;

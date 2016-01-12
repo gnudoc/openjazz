@@ -48,7 +48,13 @@ class File {
 		static std::list<std::string> configLocations;
 
 	public:
-		File                           (const char* name, bool write);
+		enum class Type
+		{
+			GameData,
+			Config,
+		};
+
+		File                           (const char* name, bool write, Type type = Type::GameData);
 		~File                          ();
 
 		static void addDataSearchPath(std::string path);
