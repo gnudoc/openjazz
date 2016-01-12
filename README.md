@@ -84,7 +84,8 @@ Please see the provided Makefiles for reference.
 
 There's currently work in progress support for CMake-based builds:
 
-```mkdir build
+```
+mkdir build
 cd build
 cmake .. && make -j4
 ```
