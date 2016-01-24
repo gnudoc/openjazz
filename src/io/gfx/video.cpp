@@ -55,7 +55,7 @@ SDL_Surface* createSurface (unsigned char * pixels, int width, int height) {
 	int y;
 
 	// Create the surface
-	ret = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 8, 0, 0, 0, 0);
+	ret = SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
 
 	// Set the surface's palette
 	video.restoreSurfacePalette(ret);
@@ -82,17 +82,12 @@ SDL_Surface* createSurface (unsigned char * pixels, int width, int height) {
  * Create the video output object.
  */
 Video::Video () {
-
-	int count;
-
-	screen = NULL;
-
 #ifdef SCALE
 	scaleFactor = 1;
 #endif
 
 	// Generate the logical palette
-	for (count = 0; count < 256; count++)
+	for (int count = 0; count < 256; count++)
 		logicalPalette[count].r = logicalPalette[count].g =
  			logicalPalette[count].b = count;
 
@@ -112,31 +107,26 @@ void Video::findMaxResolution () {
 	maxW = 320;
 	maxH = 240;
 #else
-	SDL_Rect **resolutions;
-	int count;
 
-	resolutions = SDL_ListModes(NULL, fullscreen? FULLSCREEN_FLAGS: WINDOWED_FLAGS);
-
-	if (resolutions == (SDL_Rect **)(-1)) {
-
-		maxW = MAX_SW;
-		maxH = MAX_SH;
-
-	} else {
-
-		maxW = SW;
-		maxH = SH;
-
-		for (count = 0; resolutions[count] != NULL; count++) {
-
-			if (resolutions[count]->w > maxW) maxW = resolutions[count]->w;
-			if (resolutions[count]->h > maxH) maxH = resolutions[count]->h;
-
-		}
-
-		if (maxW > MAX_SW) maxW = MAX_SW;
-		if (maxH > MAX_SH) maxH = MAX_SH;
+	int display_mode_count = SDL_GetNumDisplayModes(0);
+	if (display_mode_count < 1) {
+		SDL_Log("SDL_GetNumDisplayModes failed: %s", SDL_GetError());
+		return;
 	}
+
+	SDL_DisplayMode mode = { SDL_PIXELFORMAT_UNKNOWN, 0, 0, 0, 0 };
+	for (int i = 0; i < display_mode_count; ++i) {
+		if (SDL_GetDisplayMode(0, i, &mode) != 0) {
+			SDL_Log("SDL_GetDisplayMode failed: %s", SDL_GetError());
+			return;
+		}
+		if (mode.w > maxW)
+			maxW = mode.w;
+
+		if (mode.h > maxH)
+			maxH = mode.h;
+	}
+
 #endif
 
 	return;
@@ -154,9 +144,15 @@ void Video::findMaxResolution () {
  */
 bool Video::init (int width, int height, bool startFullscreen) {
 
+	// FIXME: needs rewrite
+
 	fullscreen = startFullscreen;
 
 	if (fullscreen) SDL_ShowCursor(SDL_DISABLE);
+
+	SDL_CreateWindowAndRenderer(320, 240, 0, &_window, &_renderer);
+
+	_screen = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGB24, 0, 320, 240);
 
 	if (!resize(width, height)) {
 
@@ -166,9 +162,9 @@ bool Video::init (int width, int height, bool startFullscreen) {
 
 	}
 
-	SDL_WM_SetCaption("OpenJazz", NULL);
-
 	findMaxResolution();
+
+	rgb_screen = SDL_ConvertSurfaceFormat(screen, SDL_PIXELFORMAT_RGB24, 0);
 
 	return true;
 
@@ -185,6 +181,7 @@ bool Video::init (int width, int height, bool startFullscreen) {
  */
 bool Video::resize (int width, int height) {
 
+	// FIXME: needs rewrite
 	screenW = width;
 	screenH = height;
 
@@ -193,13 +190,12 @@ bool Video::resize (int width, int height) {
 #endif
 
 #if defined(CAANOO) || defined(WIZ) || defined(GP2X) || defined(DINGOO)
-	screen = SDL_SetVideoMode(320, 240, 8, FULLSCREEN_FLAGS);
+	screen = createSurface(nullptr, 320, 240);
 #else
-	screen = SDL_SetVideoMode(screenW, screenH, 8, fullscreen? FULLSCREEN_FLAGS: WINDOWED_FLAGS);
+	screen = createSurface(nullptr, screenW, screenH);
 #endif
 
 	if (!screen) return false;
-
 
 #ifdef SCALE
 	// Check that the scale will fit in the current resolution
@@ -258,7 +254,7 @@ void Video::setPalette (SDL_Color *palette) {
 	clearScreen(SDL_MapRGB(screen->format, 0, 0, 0));
 	flip(0, NULL);
 
-	SDL_SetPalette(screen, SDL_PHYSPAL, palette, 0, 256);
+	SDL_SetPaletteColors(screen->format->palette, palette, 0, 256);
 	currentPalette = palette;
 
 	return;
@@ -287,7 +283,7 @@ SDL_Color* Video::getPalette () {
  */
 void Video::changePalette (SDL_Color *palette, unsigned char first, unsigned int amount) {
 
-	SDL_SetPalette(screen, SDL_PHYSPAL, palette, first, amount);
+	SDL_SetPaletteColors(screen->format->palette, palette, first, amount);
 
 	return;
 
@@ -301,7 +297,7 @@ void Video::changePalette (SDL_Color *palette, unsigned char first, unsigned int
  */
 void Video::restoreSurfacePalette (SDL_Surface* surface) {
 
-	SDL_SetPalette(surface, SDL_LOGPAL, logicalPalette, 0, 256);
+	SDL_SetPaletteColors(surface->format->palette, logicalPalette, 0, 256);
 
 	return;
 
@@ -379,8 +375,7 @@ int Video::setScaleFactor (int newScaleFactor) {
 	if ((SW * newScaleFactor <= screenW) && (SH * newScaleFactor <= screenH)) {
 
 		scaleFactor = newScaleFactor;
-
-		if (screen) resize(screenW, screenH);
+		resize(screenW, screenH);
 
 	}
 
@@ -408,8 +403,8 @@ bool Video::isFullscreen () {
  */
 void Video::expose () {
 
-	SDL_SetPalette(screen, SDL_LOGPAL, logicalPalette, 0, 256);
-	SDL_SetPalette(screen, SDL_PHYSPAL, currentPalette, 0, 256);
+	SDL_SetPaletteColors(screen->format->palette, logicalPalette, 0, 256);
+	SDL_SetPaletteColors(screen->format->palette, currentPalette, 0, 256);
 
 	return;
 
@@ -446,16 +441,12 @@ void Video::update (SDL_Event *event) {
 
 			break;
 
-		case SDL_VIDEORESIZE:
-
-			resize(event->resize.w, event->resize.h);
-
+		case SDL_WINDOWEVENT_RESIZED:
+			resize(event->window.data1, event->window.data2);
 			break;
 
-		case SDL_VIDEOEXPOSE:
-
+		case SDL_WINDOWEVENT_EXPOSED:
 			expose();
-
 			break;
 
 	}
@@ -502,7 +493,7 @@ void Video::flip (int mspf, PaletteEffect* paletteEffects) {
 
 			paletteEffects->apply(shownPalette, false, mspf);
 
-			SDL_SetPalette(screen, SDL_PHYSPAL, shownPalette, 0, 256);
+			SDL_SetPaletteColors(screen->format->palette, shownPalette, 0, 256);
 
 		} else {
 
@@ -513,7 +504,16 @@ void Video::flip (int mspf, PaletteEffect* paletteEffects) {
 	}
 
 	// Show what has been drawn
-	SDL_Flip(screen);
+
+	// FIXME: Probably sub-optimal, but I don't see any other way to do this properly yet
+	SDL_RenderClear(_renderer);
+
+	SDL_BlitSurface(screen, nullptr, rgb_screen, nullptr);
+
+	SDL_UpdateTexture(_screen, nullptr, rgb_screen->pixels, rgb_screen->pitch);
+
+	SDL_RenderCopy(_renderer, _screen, nullptr, nullptr);
+	SDL_RenderPresent(_renderer);
 
 	return;
 

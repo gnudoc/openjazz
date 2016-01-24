@@ -314,6 +314,9 @@ void JJ1Level::draw () {
 				dst.x = TTOI(x) - (vX & 31);
 				dst.y = TTOI(y) - (vY & 31);
 				src.y = TTOI(ge->tile);
+
+				// FIXME: not optimal, should not be done every frame
+				SDL_SetPaletteColors(tileSet->format->palette, canvas->format->palette->colors, 0, 256);
 				SDL_BlitSurface(tileSet, &src, canvas, &dst);
 
 			}

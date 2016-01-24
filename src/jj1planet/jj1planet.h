@@ -28,7 +28,7 @@
 
 #include "io/gfx/sprite.h"
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 
 // Class

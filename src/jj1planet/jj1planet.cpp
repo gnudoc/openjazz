@@ -135,7 +135,8 @@ int JJ1Planet::play () {
 
 	tickOffset = globalTicks;
 
-	stopMusic();
+	// FIXME: currently causes audio stutter
+	// stopMusic();
 
 	video.setPalette(palette);
 
@@ -165,5 +166,3 @@ int JJ1Planet::play () {
 	return E_NONE;
 
 }
-
-

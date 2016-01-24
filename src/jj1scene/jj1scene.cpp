@@ -430,6 +430,7 @@ int JJ1Scene::play () {
 			if (palette) {
 
 				video.setPalette(palette->palette);
+				_current_palette = palette->palette;
 
 				// Fade in from black
 				if (paletteEffect) delete paletteEffect;
@@ -459,6 +460,9 @@ int JJ1Scene::play () {
 
 					dst.x = pages[sceneIndex].bgX[bg] + ((canvasW - SW) >> 1);
 					dst.y = pages[sceneIndex].bgY[bg] + ((canvasH - SH) >> 1);
+
+					// FIXME: not optimal, should not be done every frame
+					SDL_SetPaletteColors(image->image->format->palette, _current_palette, 0, 256);
 					SDL_BlitSurface(image->image, NULL, canvas, &dst);
 
 				}
@@ -479,6 +483,9 @@ int JJ1Scene::play () {
 					dst.x = (canvasW - SW) >> 1;
 					dst.y = (canvasH - SH) >> 1;
 					frameDelay = 1000 / (pages[sceneIndex].animSpeed >> 8);
+
+					// FIXME: not optimal, should not be done every frame
+					SDL_SetPaletteColors(animation->background->format->palette, _current_palette, 0, 256);
 					SDL_BlitSurface(animation->background, NULL, canvas, &dst);
 					currentFrame = animation->sceneFrames;
 					SDL_Delay(frameDelay);
@@ -516,6 +523,9 @@ int JJ1Scene::play () {
 
 				dst.x = (canvasW - SW) >> 1;
 				dst.y = (canvasH - SH) >> 1;
+
+				// FIXME: not optimal, should not be done every frame
+				SDL_SetPaletteColors(animation->background->format->palette, _current_palette, 0, 256);
 				SDL_BlitSurface(animation->background, NULL, canvas, &dst);
 
 				if (currentFrame->soundId != -1 && animation->noSounds > 0) {

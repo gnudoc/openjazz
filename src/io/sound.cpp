@@ -31,7 +31,7 @@
 
 #include "util.h"
 
-#include <SDL/SDL_audio.h>
+#include <SDL2/SDL_audio.h>
 
 #ifdef USE_MODPLUG
 	#include <libmodplug/modplug.h>

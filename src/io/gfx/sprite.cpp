@@ -68,7 +68,7 @@ void Sprite::clearPixels () {
 
 	data = 0;
 	pixels = createSurface(&data, 1, 1);
-	SDL_SetColorKey(pixels, SDL_SRCCOLORKEY, 0);
+	SDL_SetColorKey(pixels, SDL_TRUE, 0);
 
 	return;
 
@@ -98,7 +98,7 @@ void Sprite::setPixels (unsigned char *data, int width, int height, unsigned cha
 	if (pixels) SDL_FreeSurface(pixels);
 
 	pixels = createSurface(data, width, height);
-	SDL_SetColorKey(pixels, SDL_SRCCOLORKEY, key);
+	SDL_SetColorKey(pixels, SDL_TRUE, key);
 
 	return;
 
@@ -162,7 +162,7 @@ int Sprite::getYOffset () {
  */
 void Sprite::setPalette (SDL_Color *palette, int start, int amount) {
 
-	SDL_SetPalette(pixels, SDL_LOGPAL, palette + start, start, amount);
+	SDL_SetPaletteColors(pixels->format->palette, palette + start, start, amount);
 
 	return;
 
@@ -182,7 +182,7 @@ void Sprite::flashPalette (int index) {
 	for (count = 0; count < 256; count++)
 		palette[count].r = palette[count].g = palette[count].b = index;
 
-	SDL_SetPalette(pixels, SDL_LOGPAL, palette, 0, 256);
+	SDL_SetPaletteColors(pixels->format->palette, palette, 0, 256);
 
 	return;
 
@@ -222,6 +222,8 @@ void Sprite::draw (int x, int y, bool includeOffsets) {
 
 	}
 
+	// FIXME: not optimal, should not be done every frame
+	SDL_SetPaletteColors(pixels->format->palette, canvas->format->palette->colors, 0, 256);
 	SDL_BlitSurface(pixels, NULL, canvas, &dst);
 
 	return;
@@ -240,12 +242,13 @@ void Sprite::drawScaled (int x, int y, fixed scale) {
 
 	unsigned char* srcRow;
 	unsigned char* dstRow;
-	unsigned char pixel, key;
+	unsigned char pixel;
 	int width, height, fullWidth, fullHeight;
 	int dstX, dstY;
 	int srcX, srcY;
+	Uint32 key;
 
-	key = pixels->format->colorkey;
+	SDL_GetColorKey(pixels, &key);
 
 	fullWidth = FTOI(pixels->w * scale);
 	if (x < -(fullWidth >> 1)) return; // Off-screen

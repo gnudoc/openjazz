@@ -28,7 +28,7 @@
 
 #include "paletteeffects.h"
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 
 // Constants
@@ -41,21 +41,10 @@
 #define MAX_SW 3840
 #define MAX_SH 2400
 
-#define WINDOWED_FLAGS (SDL_RESIZABLE | SDL_DOUBLEBUF | SDL_HWSURFACE | SDL_HWPALETTE)
-
-#if defined(CAANOO) || defined(WIZ) || defined(GP2X)
-	#define FULLSCREEN_FLAGS (SDL_FULLSCREEN | SDL_SWSURFACE | SDL_HWPALETTE)
-#elif defined(DINGOO)
-	#define FULLSCREEN_FLAGS 0
-#else
-	#define FULLSCREEN_FLAGS (SDL_FULLSCREEN | SDL_DOUBLEBUF | SDL_HWSURFACE | SDL_HWPALETTE)
-#endif
-
 #ifdef SCALE
 	#define MIN_SCALE 1
 	#define MAX_SCALE 4
 #endif
-
 
 // Class
 
@@ -63,17 +52,21 @@
 class Video {
 
 	private:
-		SDL_Surface* screen; ///< Output surface
+		SDL_Surface  *screen = nullptr;
+		SDL_Surface  *rgb_screen = nullptr;
+		SDL_Texture  *_screen = nullptr;
+		SDL_Window   *_window = nullptr;
+		SDL_Renderer *_renderer = nullptr;
 
 		// Palettes
 		SDL_Color*   currentPalette; ///< Current palette
 		SDL_Color    logicalPalette[256]; ///< Logical palette (greyscale)
 		bool         fakePalette; ///< Whether or not the palette mode is being emulated
 
-		int          maxW; ///< Largest possible width
-		int          maxH; ///< Largest possible height
-		int          screenW; ///< Real width
-		int          screenH; ///< Real height
+		int          maxW = 0; ///< Largest possible width
+		int          maxH = 0; ///< Largest possible height
+		int          screenW = 0; ///< Real width
+		int          screenH = 0; ///< Real height
 #ifdef SCALE
 		int          scaleFactor; ///< Scaling factor
 #endif

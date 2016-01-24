@@ -82,7 +82,6 @@ int JJ1Level::loadPanel () {
 	// Create the panel background
 	panel = createSurface(pixels, SW, 32);
 
-
 	// De-scramble the panel's ammo graphics
 
 	sorted = new unsigned char[64 * 26];
@@ -330,6 +329,10 @@ int JJ1Level::loadTiles (char* fileName) {
 	// Load the palette
 	file->loadPalette(palette);
 
+	// FIXME: doesn't belong here but happens here because of the data order?
+	SDL_SetPaletteColors(panel->format->palette, palette, 0, 256);
+	for (int i = 0; i < 6; i++)
+		SDL_SetPaletteColors(panelAmmo[i]->format->palette, palette, 0, 256);
 
 	// Load the background palette
 	file->loadPalette(skyPalette);
@@ -390,7 +393,7 @@ int JJ1Level::loadTiles (char* fileName) {
 	tiles = pos >> 10;
 
 	tileSet = createSurface(buffer, TTOI(1), TTOI(tiles));
-	SDL_SetColorKey(tileSet, SDL_SRCCOLORKEY, TKEY);
+	SDL_SetColorKey(tileSet, SDL_TRUE, TKEY);
 
 	delete[] buffer;
 

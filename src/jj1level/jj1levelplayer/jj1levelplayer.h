@@ -40,7 +40,7 @@
 #include "player/player.h"
 #include "OpenJazz.h"
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 
 // Constants

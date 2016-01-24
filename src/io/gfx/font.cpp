@@ -104,7 +104,7 @@ Font::Font (const char* fileName) {
 
 		} else characters[count] = createSurface(blank, 3, 1);
 
-		SDL_SetColorKey(characters[count], SDL_SRCCOLORKEY, 0);
+		SDL_SetColorKey(characters[count], SDL_TRUE, 0);
 
 	}
 
@@ -178,7 +178,7 @@ Font::Font (unsigned char* pixels, bool big) {
 
 		characters[count] = createSurface(chrPixels, 8, lineHeight);
 
-		if (big) SDL_SetColorKey(characters[count], SDL_SRCCOLORKEY, 31);
+		if (big) SDL_SetColorKey(characters[count], SDL_TRUE, 31);
 
 	}
 
@@ -293,7 +293,7 @@ Font::Font (bool bonus) {
 		pixels = file->loadPixels(width * height);
 
 		characters[count] = createSurface(pixels, width, height);
-		SDL_SetColorKey(characters[count], SDL_SRCCOLORKEY, 254);
+		SDL_SetColorKey(characters[count], SDL_TRUE, 254);
 
 		delete[] pixels;
 
@@ -309,7 +309,7 @@ Font::Font (bool bonus) {
 	pixels = new unsigned char[3];
 	memset(pixels, 254, 3);
 	characters[nCharacters] = createSurface(pixels, 3, 1);
-	SDL_SetColorKey(characters[nCharacters], SDL_SRCCOLORKEY, 254);
+	SDL_SetColorKey(characters[nCharacters], SDL_TRUE, 254);
 	delete[] pixels;
 
 
@@ -557,7 +557,7 @@ void Font::mapPalette (int start, int length, int newStart, int newLength) {
 			(count * newLength / length) + newStart;
 
 	for (count = 0; count < nCharacters; count++)
-		SDL_SetPalette(characters[count], SDL_LOGPAL, palette, start, length);
+		SDL_SetPaletteColors(characters[count]->format->palette, palette, start, length);
 
 	return;
 

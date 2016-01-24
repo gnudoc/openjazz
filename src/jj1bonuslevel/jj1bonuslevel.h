@@ -29,7 +29,7 @@
 
 #include "io/gfx/anim.h"
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 
 // Constants

@@ -117,9 +117,13 @@ MainMenu::MainMenu () {
 
 	}
 
-	SDL_SetColorKey(background, SDL_SRCCOLORKEY, 0);
-	SDL_SetColorKey(highlight, SDL_SRCCOLORKEY, 0);
-	SDL_SetColorKey(logo, SDL_SRCCOLORKEY, 28);
+	SDL_SetPaletteColors(logo->format->palette, palette, 0, 256);
+	SDL_SetPaletteColors(background->format->palette, palette, 0, 256);
+	SDL_SetPaletteColors(highlight->format->palette, palette, 0, 256);
+
+	SDL_SetColorKey(background, SDL_TRUE, 0);
+	SDL_SetColorKey(highlight, SDL_TRUE, 0);
+	SDL_SetColorKey(logo, SDL_TRUE, 28);
 
 	gameMenu = new GameMenu(file);
 

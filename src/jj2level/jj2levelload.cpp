@@ -365,7 +365,7 @@ int JJ2Level::loadTiles (char* fileName) {
 	}
 
 	tileSet = createSurface(tileBuffer, TTOI(1), TTOI(tiles));
-	SDL_SetColorKey(tileSet, SDL_SRCCOLORKEY, 0);
+	SDL_SetColorKey(tileSet, SDL_TRUE, 0);
 
 	// Flip tiles
 	for (count = 0; count < TTOI(tiles); count++) {
@@ -381,7 +381,7 @@ int JJ2Level::loadTiles (char* fileName) {
 	}
 
 	flippedTileSet = createSurface(tileBuffer, TTOI(1), TTOI(tiles));
-	SDL_SetColorKey(flippedTileSet, SDL_SRCCOLORKEY, 0);
+	SDL_SetColorKey(flippedTileSet, SDL_TRUE, 0);
 
 	delete[] tileBuffer;
 

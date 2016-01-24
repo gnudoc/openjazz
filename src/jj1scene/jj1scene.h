@@ -29,7 +29,7 @@
 
 #include "io/file.h"
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 
 // Enums
@@ -242,6 +242,8 @@ class JJ1Scene {
 
 		/// Scripts all information needed to render script pages, text etc
 		JJ1ScenePage*      pages;
+
+		SDL_Color *_current_palette = nullptr;
 
 		void               loadScripts      (File* f);
 		void               loadData         (File* f);
