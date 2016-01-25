@@ -247,7 +247,7 @@ int GameMenu::newGameDifficulty (GameModeType mode, char* firstLevel) {
 			fontmn2->showString(options[count], canvasW >> 2,
 				(canvasH >> 1) + (count << 4) - 32);
 
-			if (count == difficulty) fontmn2->restorePalette();
+			if (count == difficulty) fontmn2->setPalette(canvas->format->palette->colors);
 
 		}
 
@@ -361,14 +361,14 @@ int GameMenu::loadGame () {
 		fontmn2->showString("choose world:", 32, canvasH / 3);
 		fontmn2->showNumber(worldNum, 208, canvasH / 3);
 
-		if (option == 0) fontmn2->restorePalette();
+		if (option == 0) fontmn2->setPalette(canvas->format->palette->colors);
 		else fontmn2->mapPalette(240, 8, 114, 16);
 
 		fontmn2->showString("choose level:", 32, (canvasH << 1) / 3);
 		if (levelNum >= 0) fontmn2->showNumber(levelNum, 208, (canvasH << 1) / 3);
 		else fontmn2->showString("bonus", 172, (canvasH << 1) / 3);
 
-		if (option != 0) fontmn2->restorePalette();
+		if (option != 0) fontmn2->setPalette(canvas->format->palette->colors);
 
 		showEscString();
 
@@ -483,7 +483,7 @@ int GameMenu::newGameEpisode (GameModeType mode) {
 		delete[] check;
 
 		if (exists[count])
-			video.restoreSurfacePalette(episodeScreens[count]);
+			SDL_SetPaletteColors(episodeScreens[count]->format->palette, palette, 0, 256);
 		else
 			SDL_SetPaletteColors(episodeScreens[count]->format->palette, greyPalette, 0, 256);
 
@@ -552,10 +552,12 @@ int GameMenu::newGameEpisode (GameModeType mode) {
 
 		if ((episode < episodes - 1) || (episode < 6)) {
 
+			SDL_SetPaletteColors(episodeScreens[episode]->format->palette, palette, 0, 256);
 			SDL_BlitSurface(episodeScreens[episode], NULL, canvas, &dst);
 
 		} else if ((episode == 10) && (episodes > 6)) {
 
+			SDL_SetPaletteColors(episodeScreens[episode]->format->palette, palette, 0, 256);
 			SDL_BlitSurface(episodeScreens[episodes - 1], NULL, canvas, &dst);
 
 		}

@@ -57,6 +57,8 @@ Font::Font (const char* fileName) {
 
 	}
 
+	storedPalette = SDL_AllocPalette(256);
+
 	fileSize = file->getSize();
 
 	nCharacters = 128;
@@ -244,7 +246,6 @@ Font::Font (bool bonus) {
 		throw e;
 
 	}
-
 
 	fileSize = file->getSize();
 
@@ -549,6 +550,8 @@ void Font::showNumber (int n, int x, int y) {
  */
 void Font::mapPalette (int start, int length, int newStart, int newLength) {
 
+	SDL_SetPaletteColors(storedPalette, characters[0]->format->palette->colors, 0, 256);
+
 	SDL_Color palette[256];
 	int count;
 
@@ -572,10 +575,16 @@ void Font::restorePalette () {
 	int count;
 
 	for (count = 0; count < nCharacters; count++)
-		video.restoreSurfacePalette(characters[count]);
+		SDL_SetPaletteColors(characters[count]->format->palette, storedPalette->colors, 0, 256);
 
 	return;
 
+}
+
+void Font::setPalette(SDL_Color *colors)
+{
+	for (int index = 0; index < nCharacters; index++)
+		SDL_SetPaletteColors(characters[index]->format->palette, colors, 0, 256);
 }
 
 

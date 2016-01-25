@@ -424,6 +424,7 @@ void JJ1Level::draw () {
 	// Show panel data
 
 	// Show score
+	panelSmallFont->setPalette(canvas->format->palette->colors);
 	panelSmallFont->showNumber(localPlayer->getScore(), 84, canvasH - 27);
 
 	// Show time remaining

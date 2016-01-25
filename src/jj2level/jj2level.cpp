@@ -107,8 +107,8 @@ JJ2Level::~JJ2Level () {
 	delete font;
 
 	// Restore panel font palette
-	panelBigFont->restorePalette();
-	panelSmallFont->restorePalette();
+	panelBigFont->setPalette(canvas->format->palette->colors);
+	panelSmallFont->setPalette(canvas->format->palette->colors);
 
 	return;
 

@@ -293,14 +293,14 @@ void Level::drawOverlay (unsigned char bg, bool menu, int option,
 
 		for (count = 0; count < 6; count++) {
 
-			if (count == option) fontmn2->mapPalette(240, 8, selectedTextPalIndex, textPalSpan);
-			else fontmn2->mapPalette(240, 8, textPalIndex, textPalSpan);
+			if (count == option)
+				fontmn2->mapPalette(240, 8, selectedTextPalIndex, textPalSpan);
+			else
+				fontmn2->mapPalette(240, 8, textPalIndex, textPalSpan);
 
 			fontmn2->showString(menuOptions[count], canvasW >> 2, (canvasH >> 1) + (count << 4) - 46);
 
 		}
-
-		fontmn2->restorePalette();
 
 	}
 

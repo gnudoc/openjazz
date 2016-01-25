@@ -642,7 +642,7 @@ int JJ1Scene::play () {
 			// Drop shadow
 			font->mapPalette(0, 256, 0, 1);
 			font->showSceneString(text->text, xOffset + 1, yOffset + 1);
-			font->restorePalette();
+			font->setPalette(canvas->format->palette->colors);
 
 			// Text itself
 			font->showSceneString(text->text, xOffset, yOffset);

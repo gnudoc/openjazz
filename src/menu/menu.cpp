@@ -65,6 +65,7 @@ void Menu::showEscString () {
 int Menu::message (const char* text) {
 
 	video.setPalette(menuPalette);
+	fontmn2->setPalette(menuPalette);
 
 	while (true) {
 
@@ -154,7 +155,7 @@ int Menu::generic (const char** optionNames, int options, int& chosen) {
 			fontmn2->showString(optionNames[count], canvasW >> 2,
 				(canvasH >> 1) + (count << 4) - (options << 3));
 
-			if (count == chosen) fontmn2->restorePalette();
+			if (count == chosen) fontmn2->setPalette(menuPalette);
 
 		}
 
@@ -271,7 +272,7 @@ int Menu::textInput (const char* request, char*& text) {
 		// Draw the section of text after the cursor
 		input[cursor] = terminate;
 		fontmn2->showString(input + cursor, x, canvasH >> 1);
-		fontmn2->restorePalette();
+		fontmn2->setPalette(menuPalette);
 
 		showEscString();
 

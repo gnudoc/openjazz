@@ -43,6 +43,7 @@ class Font {
 		int            nCharacters; ///< Number of symbols
 		unsigned char  lineHeight; ///< Vertical spacing of displayed characters
 		char           map[128]; ///< Maps ASCII values to symbol indices
+		SDL_Palette   *storedPalette;
 
 	public:
 		Font                     (const char *fileName);
@@ -55,6 +56,7 @@ class Font {
 		void showNumber          (int n, int x, int y);
 		void mapPalette          (int start, int length, int newStart, int newLength);
 		void restorePalette      ();
+		void setPalette          (SDL_Color *colors);
 		int  getHeight           ();
 		int  getStringWidth      (const char *string);
 		int  getSceneStringWidth (const unsigned char *string);

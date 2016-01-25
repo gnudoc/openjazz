@@ -115,7 +115,7 @@ int SetupMenu::setupKeyboard () {
 				fontmn2->showString("press key", (canvasW >> 2) + 112,
 					(canvasH >> 1) + (count << 4) - 56);
 
-				fontmn2->restorePalette();
+				fontmn2->setPalette(canvas->format->palette->colors);
 
 			}
 
@@ -266,7 +266,7 @@ int SetupMenu::setupJoystick () {
 
 				fontmn2->showString("press control", (canvasW >> 2) + 112, (canvasH >> 1) + (count << 4) - 56);
 
-				fontmn2->restorePalette();
+				fontmn2->setPalette(canvas->format->palette->colors);
 
 			}
 
@@ -338,13 +338,13 @@ int SetupMenu::setupResolution () {
 		// Width
 		fontmn2->showNumber(screenW, (canvasW >> 2) + 32, canvasH >> 1);
 
-		if (!dimension) fontmn2->restorePalette();
+		if (!dimension) fontmn2->setPalette(canvas->format->palette->colors);
 		else fontmn2->mapPalette(240, 8, 114, 16);
 
 		// Height
 		fontmn2->showNumber(screenH, (canvasW >> 2) + 104, canvasH >> 1);
 
-		if (dimension) fontmn2->restorePalette();
+		if (dimension) fontmn2->setPalette(canvas->format->palette->colors);
 
 
 		count = 0;
@@ -464,7 +464,7 @@ int SetupMenu::setupScaling () {
 		// X
 		fontmn2->showString("x", (canvasW >> 2) + 40, canvasH >> 1);
 
-		fontmn2->restorePalette();
+		fontmn2->setPalette(canvas->format->palette->colors);
 
 
 		if ((controls.release(C_DOWN) || controls.release(C_LEFT)) && (scaleFactor > MIN_SCALE)) scaleFactor--;
@@ -528,7 +528,7 @@ int SetupMenu::setupSound () {
 		// Volume
 		fontmn2->mapPalette(240, 8, 114, 16);
 		fontmn2->showString("effect volume", canvasW >> 2, canvasH >> 1);
-		fontmn2->restorePalette();
+		fontmn2->setPalette(canvas->format->palette->colors);
 
 		drawRect((canvasW >> 2) + 128, canvasH >> 1, soundsVolume >> 1, 11, 175);
 
