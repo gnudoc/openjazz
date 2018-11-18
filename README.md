@@ -59,6 +59,8 @@ By default, the controls are as follows:
 
 You will need the SDL 1.2.x library (https://libsdl.org/).
 
+In ubuntu you may apt install libsdl1.2-dev
+
 For network play, you need a platform which provides sockets or use the SDL_net
 library (https://www.libsdl.org/projects/SDL_net/), then either define
 `USE_SOCKETS` or `USE_SDL_NET` in the Makefile.
@@ -67,6 +69,8 @@ For music support, you need to define `USE_MODPLUG` in the Makefile and the
 Modplug library (http://modplug-xmms.sourceforge.net/). The Modplug library
 needs to be patched to support looping tracks, otherwise half of the level will
 be silent.
+
+In ubuntu you may apt install libmodplug-dev
 
 Further instructions are available at: http://www.alister.eu/jazz/oj/build.php
 
@@ -81,6 +85,8 @@ Further instructions are available at: http://www.alister.eu/jazz/oj/build.php
 Please see the provided Makefiles for reference.
 
 ### Building using CMake
+
+In ubuntu you will need to apt install build-essential cmake
 
 There's currently work in progress support for CMake-based builds:
 
@@ -98,3 +104,9 @@ data files are expected to be under different paths (see above).
 ## Author
 
 Alister Thomson (alister_j_t at yahoo dot com)
+
+## N.B.
+
+this software runs the original game files and does not do much useful without them.
+An example of where to find them would be:
+https://www.dosgamesarchive.com/file/jazz-jackrabbit/jazz/
