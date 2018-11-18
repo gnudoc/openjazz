@@ -108,5 +108,4 @@ Alister Thomson (alister_j_t at yahoo dot com)
 ## N.B.
 
 this software runs the original game files and does not do much useful without them.
-An example of where to find them would be:
-https://www.dosgamesarchive.com/file/jazz-jackrabbit/jazz/
+The original game files can be found wherever you might find dos games archived, including in GOG
